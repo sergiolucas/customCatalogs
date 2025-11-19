@@ -8,6 +8,7 @@
         "install-server": "npm --prefix server install",
         "build-client": "npm --prefix client run build",
         "postinstall": "npm run install-server",
+        "prestart": "cd server && npx prisma db push --accept-data-loss",
         "start": "node server/src/index.js",
         "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\""
     },
