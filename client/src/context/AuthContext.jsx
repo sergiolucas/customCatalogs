@@ -10,23 +10,26 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const userId = localStorage.getItem('userId');
+        const email = localStorage.getItem('email');
         if (token && userId) {
-            setUser({ token, id: userId });
+            setUser({ token, id: userId, email });
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
         setLoading(false);
     }, []);
 
-    const login = (token, userId) => {
+    const login = (token, userId, email) => {
         localStorage.setItem('token', token);
         localStorage.setItem('userId', userId);
-        setUser({ token, id: userId });
+        if (email) localStorage.setItem('email', email);
+        setUser({ token, id: userId, email });
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     };
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');
+        localStorage.removeItem('email');
         setUser(null);
         delete axios.defaults.headers.common['Authorization'];
     };
