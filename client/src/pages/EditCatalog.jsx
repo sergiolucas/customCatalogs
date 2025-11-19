@@ -20,7 +20,7 @@ const EditCatalog = () => {
 
     const fetchCatalog = async () => {
         try {
-            const res = await axios.get('http://localhost:3000/api/catalogs');
+            const res = await axios.get('/api/catalogs');
             const catalog = res.data.find(c => c.id === id);
             if (catalog) {
                 setName(catalog.name);
@@ -36,7 +36,7 @@ const EditCatalog = () => {
         if (!searchQuery) return;
         setLoading(true);
         try {
-            const res = await axios.get(`http://localhost:3000/api/tmdb/search?query=${searchQuery}`);
+            const res = await axios.get(`/api/tmdb/search?query=${searchQuery}`);
             setSearchResults(res.data.results || []);
         } catch (error) {
             console.error('Error searching TMDB', error);
@@ -67,13 +67,13 @@ const EditCatalog = () => {
         if (!name) return alert('Please enter a catalog name');
         try {
             if (id) {
-                await axios.put(`http://localhost:3000/api/catalogs/${id}`, { name, items });
+                await axios.put(`/api/catalogs/${id}`, { name, items });
             } else {
                 // Create first, then update with items
-                const res = await axios.post('http://localhost:3000/api/catalogs', { name });
+                const res = await axios.post('/api/catalogs', { name });
                 const newId = res.data.id;
                 if (items && items.length > 0) {
-                    await axios.put(`http://localhost:3000/api/catalogs/${newId}`, { items });
+                    await axios.put(`/api/catalogs/${newId}`, { items });
                 }
             }
             navigate('/');

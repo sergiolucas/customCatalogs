@@ -9,9 +9,9 @@ const Install = () => {
 
     // Construct the addon URL
     // Assuming the server is hosted at the same domain or configured URL
-    // For local dev: http://localhost:3000
-    // The Stremio Addon URL format: http://localhost:3000/addon/USER_ID/manifest.json
-    const addonUrl = `http://localhost:3000/addon/${user?.id}/manifest.json`;
+    // For local dev: 
+    // The Stremio Addon URL format: /addon/USER_ID/manifest.json
+    const addonUrl = `${window.location.origin}/addon/${user?.id}/manifest.json`;
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(addonUrl);

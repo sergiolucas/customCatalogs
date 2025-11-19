@@ -14,7 +14,7 @@ const Dashboard = () => {
 
     const fetchCatalogs = async () => {
         try {
-            const res = await axios.get('http://localhost:3000/api/catalogs');
+            const res = await axios.get('/api/catalogs');
             setCatalogs(res.data);
         } catch (error) {
             console.error('Error fetching catalogs', error);
@@ -24,7 +24,7 @@ const Dashboard = () => {
     const deleteCatalog = async (id) => {
         if (!confirm('Are you sure?')) return;
         try {
-            await axios.delete(`http://localhost:3000/api/catalogs/${id}`);
+            await axios.delete(`/api/catalogs/${id}`);
             fetchCatalogs();
         } catch (error) {
             console.error('Error deleting catalog', error);
