@@ -19,6 +19,23 @@ router.get('/:userId/manifest.json', async (req, res) => {
             select: { id: true, name: true }
         });
 
+        // Create catalog entries that appear in both movie and series sections
+        const catalogEntries = [];
+        catalogs.forEach(cat => {
+            // Add entry for movies
+            catalogEntries.push({
+                type: 'movie',
+                id: cat.id,
+                name: cat.name
+            });
+            // Add entry for series
+            catalogEntries.push({
+                type: 'series',
+                id: cat.id,
+                name: cat.name
+            });
+        });
+
         const manifest = {
             id: `com.customcatalogs.${userId}`,
             version: '1.0.0',
@@ -26,22 +43,7 @@ router.get('/:userId/manifest.json', async (req, res) => {
             description: 'Your personal custom catalogs',
             resources: ['catalog'],
             types: ['movie', 'series'],
-            catalogs: catalogs.map(cat => ({
-                type: 'movie', // Stremio requires type, but we can mix. We'll define 'movie' and 'series' for each catalog if needed, or just 'movie' if mixed? 
-                // Actually, Stremio catalogs are type-specific usually. 
-                // Let's define two entries per catalog: one for movies, one for series, 
-                // OR just use 'movie' and 'series' types and filter items accordingly.
-                // For simplicity, let's assume the catalog supports both types but we list it twice or use 'other'?
-                // Better approach: List each catalog twice, once for 'movie' and once for 'series'.
-                id: `cat_${cat.id}`,
-                name: cat.name,
-                extra: [{ name: 'search', isRequired: false }]
-            })).concat(catalogs.map(cat => ({
-                type: 'series',
-                id: `cat_${cat.id}`,
-                name: cat.name,
-                extra: [{ name: 'search', isRequired: false }]
-            })))
+            catalogs: catalogEntries
         };
 
         res.json(manifest);
@@ -55,17 +57,13 @@ router.get('/:userId/manifest.json', async (req, res) => {
 router.get('/:userId/catalog/:type/:id.json', async (req, res) => {
     try {
         const { userId, type, id } = req.params;
-        // id is like "cat_UUID" or "cat_UUID.json" (express handles .json extension if not strict?)
-        // Stremio requests: /catalog/movie/cat_123.json
-
-        const catalogId = id.replace('cat_', '').replace('.json', '');
 
         const catalog = await prisma.catalog.findUnique({
-            where: { id: catalogId },
+            where: { id: id },
             include: {
                 items: {
                     include: { mediaItem: true },
-                    orderBy: { createdAt: 'asc' } // Order by creation time
+                    orderBy: { createdAt: 'asc' }
                 }
             }
         });
@@ -74,10 +72,9 @@ router.get('/:userId/catalog/:type/:id.json', async (req, res) => {
             return res.json({ metas: [] });
         }
 
-        // Filter items by type (movie/series) and sort by CatalogItem.createdAt
+        // Filter items by type (movie/series)
         const items = catalog.items
             .filter(i => i.mediaItem.type === type)
-            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Sort by link creation time
             .map(i => i.mediaItem);
 
         const metas = items.map(item => ({
