@@ -19,6 +19,8 @@ router.get('/:userId/manifest.json', async (req, res) => {
             select: { id: true, name: true, type: true }
         });
 
+        console.log(`Manifest request for user ${userId}: Found ${catalogs.length} catalogs`, catalogs);
+
         const manifest = {
             id: `com.customcatalogs.${userId}`,
             version: '1.0.0',
