@@ -24,7 +24,7 @@ model Catalog {
   id        String        @id @default(uuid())
   name      String
   userId    String
-  user      User          @relation(fields: [userId], references: [id])
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     CatalogItem[]
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
