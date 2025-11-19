@@ -4,8 +4,6 @@
 
 Con esta herramienta, puedes diseñar listas de películas y series a tu gusto (por ejemplo: "Maratón de Halloween", "Mis Favoritas de los 90", "Universo Marvel") y añadirlas directamente a tu Stremio mediante un addon generado dinámicamente para ti.
 
-![Stremio Custom Catalogs Banner](https://via.placeholder.com/1200x400?text=Stremio+Custom+Catalogs)
-
 ## ✨ Características
 
 -   **🔍 Búsqueda Integrada en TMDB**: Busca películas y series directamente desde la aplicación utilizando la API de The Movie Database (TMDB).
