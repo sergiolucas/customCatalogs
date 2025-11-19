@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Plus, Trash2, ExternalLink } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Download, Upload } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Dashboard = () => {
     const [catalogs, setCatalogs] = useState([]);
     const { logout } = useAuth();
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         fetchCatalogs();
@@ -31,11 +32,64 @@ const Dashboard = () => {
         }
     };
 
+    const handleExport = async () => {
+        try {
+            const res = await axios.get('/api/backup/export', { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `catalogs-backup-${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error('Export error', error);
+            alert('Error exporting data');
+        }
+    };
+
+    const handleImportClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+            try {
+                const data = JSON.parse(event.target.result);
+                await axios.post('/api/backup/import', data);
+                alert('Data imported successfully!');
+                fetchCatalogs();
+            } catch (error) {
+                console.error('Import error', error);
+                alert('Error importing data: ' + error.message);
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = null; // Reset input
+    };
+
     return (
         <div className="p-8 max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h1 className="text-3xl font-bold text-purple-500">My Catalogs</h1>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-4">
+                    <button onClick={handleExport} className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2 transition">
+                        <Download size={20} /> Backup
+                    </button>
+                    <button onClick={handleImportClick} className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded flex items-center gap-2 transition">
+                        <Upload size={20} /> Restore
+                    </button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept=".json"
+                        className="hidden"
+                    />
                     <Link to="/install" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center gap-2 transition">
                         <ExternalLink size={20} /> Install to Stremio
                     </Link>
@@ -54,7 +108,10 @@ const Dashboard = () => {
                 {catalogs.map(catalog => (
                     <div key={catalog.id} className="bg-gray-800 rounded-lg p-6 shadow-lg relative group">
                         <h3 className="text-xl font-bold mb-2">{catalog.name}</h3>
-                        <p className="text-gray-400 mb-4">{catalog.items.length} items</p>
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="text-xs bg-gray-700 px-2 py-1 rounded uppercase text-gray-300">{catalog.type || 'movie'}</span>
+                            <p className="text-gray-400">{catalog.items.length} items</p>
+                        </div>
                         <div className="flex justify-between items-center mt-4">
                             <Link to={`/catalog/${catalog.id}`} className="text-purple-400 hover:text-purple-300 font-semibold">
                                 Edit Catalog
