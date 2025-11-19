@@ -50,7 +50,8 @@ router.post('/', authenticateToken, async (req, res) => {
         });
         res.json(catalog);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating catalog' });
+        console.error('Error creating catalog:', error);
+        res.status(500).json({ error: 'Error creating catalog', details: error.message });
     }
 });
 
@@ -153,8 +154,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
         res.json(transformed);
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error updating catalog' });
+        console.error('Error updating catalog:', error);
+        res.status(500).json({ error: 'Error updating catalog', details: error.message });
     }
 });
 
