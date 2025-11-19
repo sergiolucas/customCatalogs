@@ -23,7 +23,10 @@ const __dirname = path.dirname(__filename);
 // ... middleware ...
 
 // Serve static files from the React app
-const clientDistPath = path.join(__dirname, '../../client/dist');
+// In production (Beamup), the working directory is the app root
+// In development, we're running from server directory
+const clientDistPath = path.join(process.cwd(), 'client/dist');
+console.log('Serving static files from:', clientDistPath);
 app.use(express.static(clientDistPath));
 
 // API Routes
