@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import tmdbRoutes from './routes/tmdb.js';
 import catalogRoutes from './routes/catalogs.js';
 import addonRoutes from './routes/addon.js';
+import backupRoutes from './routes/backup.js';
 import 'dotenv/config';
 
 const app = express();
@@ -34,6 +35,7 @@ app.use('/addon', addonRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tmdb', tmdbRoutes);
 app.use('/api/catalogs', catalogRoutes);
+app.use('/api/backup', backupRoutes);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
