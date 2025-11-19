@@ -16,24 +16,7 @@ router.get('/:userId/manifest.json', async (req, res) => {
 
         const catalogs = await prisma.catalog.findMany({
             where: { userId },
-            select: { id: true, name: true }
-        });
-
-        // Create catalog entries that appear in both movie and series sections
-        const catalogEntries = [];
-        catalogs.forEach(cat => {
-            // Add entry for movies
-            catalogEntries.push({
-                type: 'movie',
-                id: cat.id,
-                name: cat.name
-            });
-            // Add entry for series
-            catalogEntries.push({
-                type: 'series',
-                id: cat.id,
-                name: cat.name
-            });
+            select: { id: true, name: true, type: true }
         });
 
         const manifest = {
@@ -43,7 +26,11 @@ router.get('/:userId/manifest.json', async (req, res) => {
             description: 'Your personal custom catalogs',
             resources: ['catalog'],
             types: ['movie', 'series'],
-            catalogs: catalogEntries
+            catalogs: catalogs.map(cat => ({
+                type: cat.type,
+                id: cat.id,
+                name: cat.name
+            }))
         };
 
         res.json(manifest);

@@ -40,10 +40,11 @@ router.get('/', authenticateToken, async (req, res) => {
 // Create catalog
 router.post('/', authenticateToken, async (req, res) => {
     try {
-        const { name } = req.body;
+        const { name, type } = req.body;
         const catalog = await prisma.catalog.create({
             data: {
                 name,
+                type: type || 'movie', // Default to movie if not specified
                 userId: req.user.id
             }
         });

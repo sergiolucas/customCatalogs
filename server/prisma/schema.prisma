@@ -23,6 +23,7 @@ model User {
 model Catalog {
   id        String        @id @default(uuid())
   name      String
+  type      String
   userId    String
   user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     CatalogItem[]

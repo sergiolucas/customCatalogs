@@ -7,6 +7,7 @@ const EditCatalog = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [name, setName] = useState('');
+    const [type, setType] = useState('movie');
     const [items, setItems] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
@@ -24,6 +25,7 @@ const EditCatalog = () => {
             const catalog = res.data.find(c => c.id === id);
             if (catalog) {
                 setName(catalog.name);
+                setType(catalog.type || 'movie');
                 setItems(catalog.items || []);
             }
         } catch (error) {
@@ -49,9 +51,16 @@ const EditCatalog = () => {
         const safeItems = Array.isArray(items) ? items : [];
         if (safeItems.find(i => i.tmdbId === String(item.id))) return;
 
+        // Check if item type matches catalog type
+        const itemType = item.media_type === 'tv' ? 'series' : item.media_type;
+        if (itemType !== type) {
+            alert(`This catalog only accepts ${type === 'movie' ? 'movies' : 'series'}`);
+            return;
+        }
+
         const newItem = {
             tmdbId: String(item.id),
-            type: item.media_type || 'movie', // Default to movie if undefined
+            type: itemType,
             title: item.title || item.name || 'Unknown Title',
             poster: item.poster_path || null
         };
@@ -70,7 +79,7 @@ const EditCatalog = () => {
                 await axios.put(`/api/catalogs/${id}`, { name, items });
             } else {
                 // Create first, then update with items
-                const res = await axios.post('/api/catalogs', { name });
+                const res = await axios.post('/api/catalogs', { name, type });
                 const newId = res.data.id;
                 if (items && items.length > 0) {
                     await axios.put(`/api/catalogs/${newId}`, { items });
@@ -89,17 +98,43 @@ const EditCatalog = () => {
                 <ArrowLeft size={20} /> Back to Dashboard
             </button>
 
-            <div className="flex justify-between items-center mb-8">
-                <input
-                    type="text"
-                    placeholder="Catalog Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="text-3xl font-bold bg-transparent border-b border-gray-700 focus:border-purple-500 focus:outline-none text-white w-1/2 placeholder-gray-600"
-                />
-                <button onClick={handleSave} className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded flex items-center gap-2 font-bold transition">
-                    <Save size={20} /> Save Catalog
-                </button>
+            <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                    <input
+                        type="text"
+                        placeholder="Catalog Name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="text-3xl font-bold bg-transparent border-b border-gray-700 focus:border-purple-500 focus:outline-none text-white w-1/2 placeholder-gray-600"
+                    />
+                    <button onClick={handleSave} className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded flex items-center gap-2 font-bold transition">
+                        <Save size={20} /> Save Catalog
+                    </button>
+                </div>
+                {!id && (
+                    <div className="flex gap-4">
+                        <label className="flex items-center gap-2 text-gray-300">
+                            <input
+                                type="radio"
+                                value="movie"
+                                checked={type === 'movie'}
+                                onChange={(e) => setType(e.target.value)}
+                                className="text-purple-600"
+                            />
+                            Movies
+                        </label>
+                        <label className="flex items-center gap-2 text-gray-300">
+                            <input
+                                type="radio"
+                                value="series"
+                                checked={type === 'series'}
+                                onChange={(e) => setType(e.target.value)}
+                                className="text-purple-600"
+                            />
+                            Series
+                        </label>
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
