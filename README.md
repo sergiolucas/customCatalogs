@@ -80,10 +80,6 @@ Sigue estos pasos para ejecutar el proyecto en tu máquina local:
 6.  **¡Listo!**
     Abre tu navegador en `http://localhost:3000`.
 
-## 📸 Capturas de Pantalla
-
-*(Aquí puedes añadir capturas de tu aplicación funcionando)*
-
 ## 🤝 Contribución
 
 Las contribuciones son bienvenidas. Si tienes ideas para mejorar este proyecto, no dudes en abrir un *issue* o enviar un *pull request*.
