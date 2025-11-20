@@ -35,6 +35,9 @@ router.get('/:userId/manifest.json', async (req, res) => {
             }))
         };
 
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         res.json(manifest);
     } catch (error) {
         console.error(error);
