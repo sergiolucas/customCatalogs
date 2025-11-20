@@ -69,12 +69,80 @@ router.get('/:userId/catalog/:type/:id.json', async (req, res) => {
             .filter(i => i.mediaItem.type === type)
             .map(i => i.mediaItem);
 
-        const metas = items.map(item => ({
-            id: `tmdb:${item.tmdbId}`,
-            type: item.type,
-            name: item.title,
-            poster: item.poster ? `https://image.tmdb.org/t/p/w500${item.poster}` : null,
-        }));
+        const metas = items.map(item => {
+            // Parse genres from JSON string
+            let genres = [];
+            try {
+                genres = item.genres ? JSON.parse(item.genres) : [];
+            } catch (e) {
+                genres = [];
+            }
+
+            // Build links array
+            const links = [];
+
+            // Add IMDB link if available
+            if (item.imdbId && item.imdbRating) {
+                links.push({
+                    name: item.imdbRating,
+                    category: 'imdb',
+                    url: `https://imdb.com/title/${item.imdbId}`
+                });
+            }
+
+            // Add cast links
+            if (item.actors) {
+                const actorList = item.actors.split('#').filter(Boolean);
+                actorList.forEach(actor => {
+                    links.push({
+                        name: actor,
+                        category: 'Cast',
+                        url: `stremio:///search?search=${encodeURIComponent(actor)}`
+                    });
+                });
+            }
+
+            // Add director links
+            if (item.directors) {
+                const directorList = item.directors.split('#').filter(Boolean);
+                directorList.forEach(director => {
+                    links.push({
+                        name: director,
+                        category: 'Directors',
+                        url: `stremio:///search?search=${encodeURIComponent(director)}`
+                    });
+                });
+            }
+
+            // Build the meta object
+            const meta = {
+                id: `tmdb:${item.tmdbId}`,
+                type: item.type,
+                name: item.title,
+                poster: item.poster ? `https://image.tmdb.org/t/p/w500${item.poster}` : null,
+                genres,
+                description: item.description,
+                links,
+                rating: item.rating,
+            };
+
+            // Add optional fields if available
+            if (item.imdbRating) meta.imdbRating = item.imdbRating;
+            if (item.runtime) meta.runtime = item.runtime;
+            if (item.releaseDate) {
+                meta.released_at = item.releaseDate;
+                meta.released = new Date(item.releaseDate).toISOString();
+            }
+            if (item.background) meta.background = item.background;
+            if (item.logo) meta.logo = item.logo;
+            if (item.actors) meta.actors = item.actors;
+            if (item.directors) meta.directors = item.directors;
+            if (item.lastEpisodeDate) {
+                meta.last_episode_released_at = item.lastEpisodeDate;
+            }
+
+            return meta;
+        });
 
         res.json({ metas });
 

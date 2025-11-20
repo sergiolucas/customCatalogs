@@ -32,14 +32,26 @@ model Catalog {
 }
 
 model MediaItem {
-  id        String        @id @default(uuid())
-  tmdbId    String
-  type      String
-  title     String
-  poster    String?
-  catalogs  CatalogItem[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id               String        @id @default(uuid())
+  tmdbId           String
+  type             String
+  title            String
+  poster           String?
+  genres           String?       // JSON array as string
+  imdbRating       String?
+  description      String?
+  runtime          String?
+  releaseDate      String?
+  rating           Float?
+  background       String?
+  logo             String?
+  actors           String?       // "#" separated list
+  directors        String?       // "#" separated list
+  imdbId           String?
+  lastEpisodeDate  String?       // For series only
+  catalogs         CatalogItem[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 
   @@unique([tmdbId, type])
 }

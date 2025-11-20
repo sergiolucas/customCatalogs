@@ -76,8 +76,12 @@ router.put('/:id', authenticateToken, async (req, res) => {
         }
 
         if (items) {
-            // 1. Upsert all MediaItems first
+            // 1. Upsert all MediaItems first with complete metadata
             for (const item of items) {
+                // Fetch complete metadata from TMDB
+                const { getMediaDetails } = await import('../services/tmdbService.js');
+                const metadata = await getMediaDetails(String(item.tmdbId), item.type);
+
                 await prisma.mediaItem.upsert({
                     where: {
                         tmdbId_type: {
@@ -87,13 +91,15 @@ router.put('/:id', authenticateToken, async (req, res) => {
                     },
                     update: {
                         title: item.title,
-                        poster: item.poster
+                        poster: item.poster,
+                        ...(metadata || {})
                     },
                     create: {
                         tmdbId: String(item.tmdbId),
                         type: item.type,
                         title: item.title,
-                        poster: item.poster
+                        poster: item.poster,
+                        ...(metadata || {})
                     }
                 });
             }
