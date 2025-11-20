@@ -160,7 +160,7 @@ const EditCatalog = () => {
                         {searchResults.map(item => (
                             <div key={item.id} className="flex gap-3 bg-gray-700 p-2 rounded hover:bg-gray-600 transition group">
                                 <img
-                                    src={item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://via.placeholder.com/92x138?text=No+Image'}
+                                    src={item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : 'https://placehold.co/92x138?text=No+Image'}
                                     alt={item.title || item.name}
                                     className="w-12 h-18 object-cover rounded"
                                 />
@@ -189,7 +189,7 @@ const EditCatalog = () => {
                             {items.map((item, idx) => (
                                 <div key={`${item.tmdbId}-${idx}`} className="relative group">
                                     <img
-                                        src={item.poster ? `https://image.tmdb.org/t/p/w300${item.poster}` : 'https://via.placeholder.com/300x450?text=No+Image'}
+                                        src={item.poster ? `https://image.tmdb.org/t/p/w300${item.poster}` : 'https://placehold.co/300x450?text=No+Image'}
                                         alt={item.title}
                                         className="w-full aspect-[2/3] object-cover rounded-lg shadow-md"
                                     />
